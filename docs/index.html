@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Job Market Data Pipeline | Keith's Portfolio</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.plot.ly/plotly-2.27.0.min.js"></script>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="container">
+            <div class="nav-brand">
+                <h1>📊 Job Market Pipeline</h1>
+            </div>
+            <ul class="nav-links">
+                <li><a href="index.html" class="active">Overview</a></li>
+                <li><a href="pipeline.html">Pipeline</a></li>
+                <li><a href="insights.html">Insights</a></li>
+                <li><a href="https://github.com/keithcockerham/job-market-pipeline" target="_blank">GitHub</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="container">
+            <div class="hero-content">
+                <h2>Real-Time Job Market Intelligence</h2>
+                <p class="subtitle">An automated data engineering pipeline collecting, cleaning, and analyzing job postings from multiple APIs</p>
+                <div class="hero-badges">
+                    <span class="badge badge-primary">🐳 Docker</span>
+                    <span class="badge badge-secondary">⏰ Apache Airflow</span>
+                    <span class="badge badge-tertiary">🐘 PostgreSQL</span>
+                    <span class="badge badge-primary">🐍 Python</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Key Metrics -->
+    <section class="metrics">
+        <div class="container">
+            <div class="metrics-grid">
+                <div class="metric-card">
+                    <div class="metric-icon">📡</div>
+                    <div class="metric-value">3</div>
+                    <div class="metric-label">Data Sources</div>
+                    <div class="metric-desc">Adzuna, USAJobs, Jooble APIs</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-icon">💼</div>
+                    <div class="metric-value" id="totalJobs">44,547</div>
+                    <div class="metric-label">Clean Job Postings</div>
+                    <div class="metric-desc">Deduplicated & validated</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-icon">🗺️</div>
+                    <div class="metric-value">51</div>
+                    <div class="metric-label">US States and DC</div>
+                    <div class="metric-desc">Nationwide coverage</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-icon">⏱️</div>
+                    <div class="metric-value">Daily</div>
+                    <div class="metric-label">Refresh Rate</div>
+                    <div class="metric-desc">Automated nightly collection</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- US Map - Jobs by State -->
+    <section class="results-preview">
+        <div class="container">
+            <h2>Job Distribution Across the United States</h2>
+            <div id="jobsMapChart" class="chart-container" style="height: 500px;"></div>
+        </div>
+    </section>
+
+    <!-- US Map - Salary by State -->
+    <section class="overview">
+        <div class="container">
+            <h2>Average Salary by State</h2>
+            <div id="salaryMapChart" class="chart-container" style="height: 500px;"></div>
+        </div>
+    </section>
+
+    <!-- Pipeline Overview -->
+    <section class="technical">
+        <div class="container">
+            <h2>Pipeline Architecture</h2>
+            <div class="tech-grid">
+                <div class="tech-card">
+                    <h3>🔄 Data Collection</h3>
+                    <ul>
+                        <li>3 API integrations (Adzuna, USAJobs, Jooble)</li>
+                        <li>Parallel execution with Airflow</li>
+                        <li>Rate limiting & retry logic</li>
+                        <li>50 states × 10 job categories</li>
+                    </ul>
+                </div>
+                <div class="tech-card">
+                    <h3>🧹 Data Cleaning</h3>
+                    <ul>
+                        <li>Salary normalization (hourly/monthly/annual)</li>
+                        <li>Location standardization (city/state)</li>
+                        <li>Job type extraction</li>
+                        <li>Deduplication by job_id</li>
+                    </ul>
+                </div>
+                <div class="tech-card">
+                    <h3>🗄️ Data Storage</h3>
+                    <ul>
+                        <li>PostgreSQL in Docker</li>
+                        <li>Raw & cleaned data tables</li>
+                        <li>Incremental loading</li>
+                        <li>Automated JSON cleanup</li>
+                    </ul>
+                </div>
+                <div class="tech-card">
+                    <h3>📊 Orchestration</h3>
+                    <ul>
+                        <li>Apache Airflow DAGs</li>
+                        <li>8-task pipeline</li>
+                        <li>Scheduled nightly runs</li>
+                        <li>Error handling & retries</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Source Breakdown Chart -->
+    <section class="results-preview">
+        <div class="container">
+            <h2>Data Sources Comparison</h2>
+            <div class="overview-grid" style="margin-bottom: 2rem;">
+                <div id="sourceBreakdownChart" class="chart-container" style="height: 400px;"></div>
+                <div id="salaryBySourceChart" class="chart-container" style="height: 400px;"></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Skills Section -->
+    <section class="skills">
+        <div class="container">
+            <h2>Technologies Used</h2>
+            <div class="skills-grid">
+                <div class="skill-category">
+                    <h3>Data Engineering</h3>
+                    <div class="skill-tags">
+                        <span class="skill-tag">Apache Airflow</span>
+                        <span class="skill-tag">PostgreSQL</span>
+                        <span class="skill-tag">Docker</span>
+                        <span class="skill-tag">ETL Pipelines</span>
+                    </div>
+                </div>
+                <div class="skill-category">
+                    <h3>Python</h3>
+                    <div class="skill-tags">
+                        <span class="skill-tag">Pandas</span>
+                        <span class="skill-tag">SQLAlchemy</span>
+                        <span class="skill-tag">Requests</span>
+                        <span class="skill-tag">API Integration</span>
+                    </div>
+                </div>
+                <div class="skill-category">
+                    <h3>Infrastructure</h3>
+                    <div class="skill-tags">
+                        <span class="skill-tag">Docker Compose</span>
+                        <span class="skill-tag">GitHub Pages</span>
+                        <span class="skill-tag">Environment Management</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA -->
+    <section class="cta">
+        <div class="container">
+            <h2>Explore the Pipeline</h2>
+            <div class="cta-buttons">
+                <a href="pipeline.html" class="btn btn-primary">View Architecture</a>
+                <a href="insights.html" class="btn btn-secondary">See Insights</a>
+                <a href="https://github.com/keithcockerham/job-market-pipeline" class="btn btn-secondary" target="_blank">GitHub Repo</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <p>Built by Keith | <a href="https://github.com/keithcockerham">GitHub</a> | <a href="https://linkedin.com/in/kcockerham">LinkedIn</a></p>
+        </div>
+    </footer>
+
+    <script src="job-market-charts.js"></script>
+</body>
+</html>

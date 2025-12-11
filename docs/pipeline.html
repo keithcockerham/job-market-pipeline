@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pipeline Architecture | Job Market Data Pipeline</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.plot.ly/plotly-2.27.0.min.js"></script>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="container">
+            <div class="nav-brand">
+                <h1>📊 Job Market Pipeline</h1>
+            </div>
+            <ul class="nav-links">
+                <li><a href="index.html">Overview</a></li>
+                <li><a href="pipeline.html" class="active">Pipeline</a></li>
+                <li><a href="insights.html">Insights</a></li>
+                <li><a href="https://github.com/keithcockerham/job-market-pipeline" target="_blank">GitHub</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="container">
+            <div class="hero-content">
+                <h2>Pipeline Architecture</h2>
+                <p class="subtitle">A fully automated ETL pipeline built with Docker, Airflow, and PostgreSQL</p>
+                <div class="hero-badges">
+                    <span class="badge badge-primary">8 DAG Tasks</span>
+                    <span class="badge badge-secondary">3 Data Sources</span>
+                    <span class="badge badge-tertiary">Nightly Automation</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Pipeline Flow Sankey -->
+    <section class="results-preview">
+        <div class="container">
+            <h2>Data Flow Visualization</h2>
+            <div id="pipelineFlowChart" class="chart-container" style="height: 450px;"></div>
+        </div>
+    </section>
+
+    <!-- DAG Structure -->
+    <section class="overview">
+        <div class="container">
+            <h2>Airflow DAG Structure</h2>
+            <div id="dagStructureChart" class="chart-container" style="height: 400px;"></div>
+            <div class="overview-grid" style="margin-top: 2rem;">
+                <div class="overview-card">
+                    <h3>⏰ Schedule</h3>
+                    <p>Pipeline runs nightly at 11 PM CST, ensuring fresh data is available by morning. Uses cron expression: <code>0 23 * * *</code></p>
+                </div>
+                <div class="overview-card">
+                    <h3>🔄 Parallel Execution</h3>
+                    <p>All three API collection tasks run simultaneously, reducing total execution time from ~51 minutes to ~17 minutes.</p>
+                </div>
+                <div class="overview-card">
+                    <h3>🛡️ Error Handling</h3>
+                    <p>Built-in retry logic with exponential backoff. Tasks automatically retry up to 2 times with 5-minute delays.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Task Details -->
+    <section class="technical">
+        <div class="container">
+            <h2>Pipeline Tasks</h2>
+            <div class="tech-grid">
+                <div class="tech-card">
+                    <h3>1️⃣ collect_adzuna</h3>
+                    <ul>
+                        <li>Queries Adzuna Jobs API</li>
+                        <li>50 states × 10 job categories</li>
+                        <li>Rate limited: 250 requests/day</li>
+                        <li>2-second delay between requests</li>
+                        <li>Saves to JSON for batch processing</li>
+                    </ul>
+                </div>
+                <div class="tech-card">
+                    <h3>2️⃣ collect_usajobs</h3>
+                    <ul>
+                        <li>Queries USAJobs.gov API</li>
+                        <li>Federal government positions</li>
+                        <li>No strict rate limit (be polite)</li>
+                        <li>Captures GS pay scale data</li>
+                        <li>Includes security clearance info</li>
+                    </ul>
+                </div>
+                <div class="tech-card">
+                    <h3>3️⃣ collect_jooble</h3>
+                    <ul>
+                        <li>Queries Jooble aggregator API</li>
+                        <li>Aggregates multiple job boards</li>
+                        <li>Broader salary range coverage</li>
+                        <li>International postings filtered out</li>
+                        <li>JSON response transformation</li>
+                    </ul>
+                </div>
+                <div class="tech-card">
+                    <h3>4️⃣ load_raw_to_db</h3>
+                    <ul>
+                        <li>Loads JSON files to PostgreSQL</li>
+                        <li>Deduplicates by job_id</li>
+                        <li>Tracks existing IDs in memory</li>
+                        <li>Incremental loading (append only new)</li>
+                        <li>Reports new vs skipped counts</li>
+                    </ul>
+                </div>
+                <div class="tech-card">
+                    <h3>5️⃣ cleanup_json_files</h3>
+                    <ul>
+                        <li>Removes processed JSON files</li>
+                        <li>Prevents disk space bloat</li>
+                        <li>Only runs after successful load</li>
+                        <li>Logs deleted file count</li>
+                        <li>Error handling for locked files</li>
+                    </ul>
+                </div>
+                <div class="tech-card">
+                    <h3>6️⃣ clean_data</h3>
+                    <ul>
+                        <li>Standardizes location (city/state)</li>
+                        <li>Normalizes salary (hourly→annual)</li>
+                        <li>Fixes 'k' notation ($150k→$150,000)</li>
+                        <li>Extracts job type categories</li>
+                        <li>Drops international/military</li>
+                    </ul>
+                </div>
+                <div class="tech-card">
+                    <h3>7️⃣ verify_cleaned_data</h3>
+                    <ul>
+                        <li>Validates cleaned data quality</li>
+                        <li>Checks required columns exist</li>
+                        <li>Ensures row count consistency</li>
+                        <li>Fails pipeline if issues found</li>
+                        <li>Reports retention rate</li>
+                    </ul>
+                </div>
+                <div class="tech-card">
+                    <h3>8️⃣ generate_summary</h3>
+                    <ul>
+                        <li>Produces run statistics</li>
+                        <li>Counts by source</li>
+                        <li>Raw vs cleaned comparison</li>
+                        <li>Logs to Airflow for monitoring</li>
+                        <li>Can trigger alerts if needed</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Infrastructure -->
+    <section class="findings">
+        <div class="container">
+            <h2>Infrastructure Stack</h2>
+            <div class="findings-grid">
+                <div class="finding-card">
+                    <div class="finding-icon">🐳</div>
+                    <h3>Docker Compose</h3>
+                    <p>Multi-container orchestration with 4 services: PostgreSQL (data), PostgreSQL (Airflow metadata), Airflow Webserver, and Airflow Scheduler. Volumes persist data between restarts.</p>
+                </div>
+                <div class="finding-card">
+                    <div class="finding-icon">⏰</div>
+                    <h3>Apache Airflow</h3>
+                    <p>DAG-based workflow orchestration with LocalExecutor. Web UI for monitoring at localhost:8080. Custom Docker image with pre-installed Python packages.</p>
+                </div>
+                <div class="finding-card">
+                    <div class="finding-icon">🐘</div>
+                    <h3>PostgreSQL</h3>
+                    <p>Two database instances: job_market (port 5433) for collected data, airflow (internal) for metadata. Unique constraint on job_id prevents duplicates at database level.</p>
+                </div>
+                <div class="finding-card">
+                    <div class="finding-icon">🐍</div>
+                    <h3>Python 3.11</h3>
+                    <p>Core language for all API clients and data transformations. Key packages: pandas, sqlalchemy, requests, python-dotenv. Custom modules for each API.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Data Cleaning Details -->
+    <section class="results-preview">
+        <div class="container">
+            <h2>Data Cleaning Transformations</h2>
+            <div class="results-table-container">
+                <table class="results-table">
+                    <thead>
+                        <tr>
+                            <th>Transformation</th>
+                            <th>Issue</th>
+                            <th>Solution</th>
+                            <th>Records Affected</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>K Notation Fix</td>
+                            <td>$150k stored as 150</td>
+                            <td>Multiply by 1,000</td>
+                            <td>~6,356</td>
+                        </tr>
+                        <tr>
+                            <td>Hourly to Annual</td>
+                            <td>$40/hour not converted</td>
+                            <td>Multiply by 2,080</td>
+                            <td>~1,283</td>
+                        </tr>
+                        <tr>
+                            <td>Monthly to Annual</td>
+                            <td>$3,000/month not converted</td>
+                            <td>Multiply by 12</td>
+                            <td>~152</td>
+                        </tr>
+                        <tr>
+                            <td>Weekly to Annual</td>
+                            <td>$1,000/week not converted</td>
+                            <td>Multiply by 52</td>
+                            <td>~45</td>
+                        </tr>
+                        <tr>
+                            <td>Location Parsing</td>
+                            <td>Mixed formats (city, state)</td>
+                            <td>Split and standardize to 2-letter codes</td>
+                            <td>All records</td>
+                        </tr>
+                        <tr>
+                            <td>Job Type Extraction</td>
+                            <td>Messy free-text values</td>
+                            <td>Map to categories (Full-time, Contract, etc.)</td>
+                            <td>~5,520</td>
+                        </tr>
+                        <tr>
+                            <td>Salary Max Imputation</td>
+                            <td>Only min salary provided</td>
+                            <td>Add source-specific median spread</td>
+                            <td>~1,522</td>
+                        </tr>
+                        <tr>
+                            <td>Per-Unit Removal</td>
+                            <td>Ambiguous "per unit" pay</td>
+                            <td>Drop records</td>
+                            <td>~15</td>
+                        </tr>
+                        <tr>
+                            <td>International Filter</td>
+                            <td>Non-US locations</td>
+                            <td>Drop records without US state code</td>
+                            <td>~66</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </section>
+
+    <!-- Database Schema -->
+    <section class="overview">
+        <div class="container">
+            <h2>Database Schema</h2>
+            <div class="overview-grid">
+                <div class="overview-card">
+                    <h3>📥 raw_jobs</h3>
+                    <p><strong>Purpose:</strong> Store all collected data exactly as received from APIs.</p>
+                    <p><strong>Key Columns:</strong> job_id (unique), title, company, location, salary_text, salary_min, salary_max, source, scraped_at</p>
+                    <p><strong>Rows:</strong> ~62,580 (with duplicates across runs)</p>
+                </div>
+                <div class="overview-card">
+                    <h3>✨ cleaned_jobs</h3>
+                    <p><strong>Purpose:</strong> Analysis-ready data after cleaning and deduplication.</p>
+                    <p><strong>Key Columns:</strong> job_id (unique), title, company, location_city, location_state, salary_min, salary_max, job_type, source</p>
+                    <p><strong>Rows:</strong> ~44,547 (deduplicated)</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Challenges & Solutions -->
+    <section class="technical">
+        <div class="container">
+            <h2>Challenges & Solutions</h2>
+            <div class="tech-grid">
+                <div class="tech-card">
+                    <h3>🔌 Port Conflicts</h3>
+                    <ul>
+                        <li><strong>Issue:</strong> Local PostgreSQL on 5432 conflicted with Docker</li>
+                        <li><strong>Solution:</strong> Mapped Docker to port 5433</li>
+                    </ul>
+                </div>
+                <div class="tech-card">
+                    <h3>📦 Package Installation</h3>
+                    <ul>
+                        <li><strong>Issue:</strong> Airflow blocked runtime pip install</li>
+                        <li><strong>Solution:</strong> Custom Dockerfile with pre-installed packages</li>
+                    </ul>
+                </div>
+                <div class="tech-card">
+                    <h3>🔐 Environment Variables</h3>
+                    <ul>
+                        <li><strong>Issue:</strong> .env not loading in Airflow containers</li>
+                        <li><strong>Solution:</strong> Mount .env file and use absolute paths</li>
+                    </ul>
+                </div>
+                <div class="tech-card">
+                    <h3>📁 Relative Paths</h3>
+                    <ul>
+                        <li><strong>Issue:</strong> Scripts failed with "./data/raw" paths</li>
+                        <li><strong>Solution:</strong> Converted all paths to absolute (/opt/airflow/...)</li>
+                    </ul>
+                </div>
+                <div class="tech-card">
+                    <h3>🔄 Deduplication</h3>
+                    <ul>
+                        <li><strong>Issue:</strong> 103K rows but only 44K unique job_ids</li>
+                        <li><strong>Solution:</strong> Load existing IDs to memory, check before insert</li>
+                    </ul>
+                </div>
+                <div class="tech-card">
+                    <h3>⚡ API Rate Limits</h3>
+                    <ul>
+                        <li><strong>Issue:</strong> Adzuna limited to 250 requests/day</li>
+                        <li><strong>Solution:</strong> 50 results/page, 2s delays, prioritize key states</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA -->
+    <section class="cta">
+        <div class="container">
+            <h2>Explore the Data</h2>
+            <div class="cta-buttons">
+                <a href="insights.html" class="btn btn-primary">View Insights</a>
+                <a href="index.html" class="btn btn-secondary">Back to Overview</a>
+                <a href="https://github.com/keithcockerham/job-market-pipeline" class="btn btn-secondary" target="_blank">View Code</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <p>Built by Keith | <a href="https://github.com/keithcockerham">GitHub</a> | <a href="https://linkedin.com/in/kcockerham">LinkedIn</a></p>
+        </div>
+    </footer>
+
+    <script src="job-market-charts.js"></script>
+    <script>
+        // DAG Structure Timeline Chart
+        function createDagStructure() {
+            const tasks = [
+                'collect_adzuna',
+                'collect_usajobs', 
+                'collect_jooble',
+                'load_raw_to_db',
+                'cleanup_json_files',
+                'clean_data',
+                'verify_cleaned_data',
+                'generate_summary'
+            ];
+            
+            const startTimes = [0, 0, 0, 17, 18, 19, 21, 22];
+            const durations = [17, 17, 17, 1, 1, 2, 1, 0.5];
+            
+            const colors = [
+                '#667eea', '#764ba2', '#f5576c',  // Collection (parallel)
+                '#feca57',  // Load
+                '#a55eea',  // Cleanup
+                '#43e97b',  // Clean
+                '#00f2fe',  // Verify
+                '#38ef7d'   // Summary
+            ];
+
+            const data = tasks.map((task, i) => ({
+                x: [startTimes[i], startTimes[i] + durations[i]],
+                y: [task, task],
+                mode: 'lines',
+                line: { color: colors[i], width: 25 },
+                name: task,
+                hovertemplate: `<b>${task}</b><br>Start: ${startTimes[i]} min<br>Duration: ${durations[i]} min<extra></extra>`
+            }));
+
+            const layout = {
+                title: {
+                    text: 'DAG Execution Timeline (~23 minutes total)',
+                    font: { size: 18 }
+                },
+                xaxis: {
+                    title: 'Minutes from Start',
+                    range: [-1, 25],
+                    tickvals: [0, 5, 10, 15, 17, 20, 23]
+                },
+                yaxis: {
+                    automargin: true,
+                    categoryorder: 'array',
+                    categoryarray: tasks.reverse()
+                },
+                showlegend: false,
+                paper_bgcolor: '#ffffff',
+                plot_bgcolor: '#f7fafc',
+                margin: { t: 60, b: 60, l: 150, r: 40 },
+                annotations: [
+                    {
+                        x: 8.5,
+                        y: 1.15,
+                        xref: 'x',
+                        yref: 'paper',
+                        text: '← Parallel Execution →',
+                        showarrow: false,
+                        font: { size: 12, color: '#718096' }
+                    },
+                    {
+                        x: 20,
+                        y: 1.15,
+                        xref: 'x',
+                        yref: 'paper',
+                        text: 'Sequential →',
+                        showarrow: false,
+                        font: { size: 12, color: '#718096' }
+                    }
+                ],
+                shapes: [{
+                    type: 'line',
+                    x0: 17,
+                    x1: 17,
+                    y0: -0.5,
+                    y1: 7.5,
+                    line: { color: '#e2e8f0', width: 2, dash: 'dash' }
+                }]
+            };
+
+            const config = { responsive: true, displayModeBar: false };
+            Plotly.newPlot('dagStructureChart', data, layout, config);
+        }
+
+        // Initialize on load
+        document.addEventListener('DOMContentLoaded', function() {
+            createDagStructure();
+        });
+    </script>
+</body>
+</html>

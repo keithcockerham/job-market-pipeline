@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Data Insights | Job Market Data Pipeline</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.plot.ly/plotly-2.27.0.min.js"></script>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="container">
+            <div class="nav-brand">
+                <h1>📊 Job Market Pipeline</h1>
+            </div>
+            <ul class="nav-links">
+                <li><a href="index.html">Overview</a></li>
+                <li><a href="pipeline.html">Pipeline</a></li>
+                <li><a href="insights.html" class="active">Insights</a></li>
+                <li><a href="https://github.com/keithcockerham/job-market-pipeline" target="_blank">GitHub</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="container">
+            <div class="hero-content">
+                <h2>Job Market Insights</h2>
+                <p class="subtitle">Key findings from <span id="heroTotalJobs">--</span> data science and analytics job postings</p>
+                <div class="hero-badges">
+                    <span class="badge badge-primary"><span id="heroStatesCount">--</span> States and DC Covered</span>
+                    <span class="badge badge-secondary" id="heroSalaryRange">$--K - $--K Salary Range</span>
+                    <span class="badge badge-tertiary">3 Data Sources</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Key Findings -->
+    <section class="metrics">
+        <div class="container">
+            <div class="metrics-grid">
+                <div class="metric-card">
+                    <div class="metric-icon">🏆</div>
+                    <div class="metric-value" id="metricTopState">--</div>
+                    <div class="metric-label">Top State for Jobs</div>
+                    <div class="metric-desc" id="metricTopStateDesc">-- data science postings</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-icon">💰</div>
+                    <div class="metric-value" id="metricHighestSalary">$--K</div>
+                    <div class="metric-label">Highest Avg Salary</div>
+                    <div class="metric-desc" id="metricHighestSalaryState">-- leads</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-icon">🏛️</div>
+                    <div class="metric-value" id="metricFederalSalary">$--K</div>
+                    <div class="metric-label">Federal Avg Salary</div>
+                    <div class="metric-desc">USAJobs GS scale positions</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-icon">📈</div>
+                    <div class="metric-value" id="metricFullTimePercent">--%</div>
+                    <div class="metric-label">Full-Time Positions</div>
+                    <div class="metric-desc" id="metricJobTypeBreakdown">Contract: --%, Other: --%</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Geographic Distribution -->
+    <section class="results-preview">
+        <div class="container">
+            <h2>Geographic Distribution</h2>
+            <div id="jobsMapChartInsights" class="chart-container" style="height: 500px;"></div>
+        </div>
+    </section>
+
+    <!-- Top States Chart -->
+    <section class="overview">
+        <div class="container">
+            <h2>Top 10 States by Job Count</h2>
+            <div id="topStatesChart" class="chart-container" style="height: 400px;"></div>
+        </div>
+    </section>
+
+    <!-- Salary Analysis -->
+    <section class="results-preview">
+        <div class="container">
+            <h2>Salary Analysis</h2>
+            <div class="overview-grid">
+                <div id="salaryMapChartInsights" class="chart-container" style="height: 450px;"></div>
+                <div id="salaryBySourceDetailChart" class="chart-container" style="height: 450px;"></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Job Type Distribution -->
+    <section class="overview">
+        <div class="container">
+            <h2>Position Types</h2>
+            <div class="overview-grid">
+                <div id="jobTypeChart" class="chart-container" style="height: 400px;"></div>
+                <div id="jobTypeBySourceChart" class="chart-container" style="height: 400px;"></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Top Companies -->
+    <section class="results-preview">
+        <div class="container">
+            <h2>Top Hiring Organizations</h2>
+            <div id="topCompaniesChart" class="chart-container" style="height: 450px;"></div>
+        </div>
+    </section>
+
+    <!-- Top Job Titles -->
+    <section class="overview">
+        <div class="container">
+            <h2>Top Job Titles</h2>
+            <div id="keywordChart" class="chart-container" style="height: 450px;"></div>
+        </div>
+    </section>
+
+    <!-- CTA -->
+    <section class="cta">
+        <div class="container">
+            <h2>Explore the Pipeline</h2>
+            <div class="cta-buttons">
+                <a href="pipeline.html" class="btn btn-primary">View Architecture</a>
+                <a href="index.html" class="btn btn-secondary">Back to Overview</a>
+                <a href="https://github.com/keithcockerham/job-market-pipeline" class="btn btn-secondary" target="_blank">View Code</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <p>Built by Keith | <a href="https://github.com/keithcockerham">GitHub</a> | <a href="https://linkedin.com/in/kcockerham">LinkedIn</a></p>
+        </div>
+    </footer>
+
+    <script src="job-market-charts.js"></script>
+</body>
+</html>

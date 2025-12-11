@@ -1,0 +1,79 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:15
+    container_name: job_market_postgres
+    environment:
+      POSTGRES_USER: ${DB_USER:-postgres}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-your_password_here}
+      POSTGRES_DB: ${DB_NAME:-job_market}
+    ports:
+      - "5433:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - job_pipeline
+
+  airflow-postgres:
+    image: postgres:15
+    container_name: airflow_postgres
+    environment:
+      POSTGRES_USER: airflow
+      POSTGRES_PASSWORD: ${AIRFLOW_DB_PASSWORD:-your_password_here}
+      POSTGRES_DB: airflow
+    networks:
+      - job_pipeline
+
+  airflow-webserver:
+    build:
+      context: .
+      dockerfile: Dockerfile.airflow
+    container_name: airflow_webserver
+    environment:
+      AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://airflow:${AIRFLOW_DB_PASSWORD:-your_password_here}@airflow-postgres:5432/airflow
+      AIRFLOW__CORE__EXECUTOR: LocalExecutor
+      AIRFLOW__CORE__FERNET_KEY: ${FERNET_KEY:-your_fernet_key_here}
+      _AIRFLOW_DB_MIGRATE: 'true'
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./dags:/opt/airflow/dags
+      - ./scrapers:/opt/airflow/scrapers
+      - ./logs:/opt/airflow/logs
+      - ./data:/opt/airflow/data
+      - ./.env:/opt/airflow/.env
+    networks:
+      - job_pipeline
+    depends_on:
+      - airflow-postgres
+      - postgres
+    command: webserver
+
+  airflow-scheduler:
+    build:
+      context: .
+      dockerfile: Dockerfile.airflow
+    container_name: airflow_scheduler
+    environment:
+      AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://airflow:${AIRFLOW_DB_PASSWORD:-your_password_here}@airflow-postgres:5432/airflow
+      AIRFLOW__CORE__EXECUTOR: LocalExecutor
+      AIRFLOW__CORE__FERNET_KEY: ${FERNET_KEY:-your_fernet_key_here}
+    volumes:
+      - ./dags:/opt/airflow/dags
+      - ./scrapers:/opt/airflow/scrapers
+      - ./logs:/opt/airflow/logs
+      - ./data:/opt/airflow/data
+      - ./.env:/opt/airflow/.env
+    networks:
+      - job_pipeline
+    depends_on:
+      - airflow-webserver
+    command: scheduler
+
+volumes:
+  postgres_data:
+
+networks:
+  job_pipeline:
+    driver: bridge
