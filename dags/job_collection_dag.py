@@ -248,6 +248,33 @@ verify_cleaned = PythonOperator(
     dag=dag,
 )
 
+def generate_dashboard_data():
+    """Generate JSON file for dashboard visualizations"""
+    import subprocess
+    
+    print("Generating dashboard data...")
+    
+    result = subprocess.run(
+        ['python', '/opt/airflow/scrapers/generate_dashboard_data.py'],
+        cwd='/opt/airflow/scrapers',
+        capture_output=True,
+        text=True
+    )
+    
+    print(result.stdout)
+    if result.returncode != 0:
+        print(f"Error: {result.stderr}")
+        raise Exception("Dashboard data generation failed")
+    
+    print("Dashboard data generated")
+    return "success"
+
+generate_dashboard = PythonOperator(
+    task_id='generate_dashboard_data',
+    python_callable=generate_dashboard_data,
+    dag=dag,
+)
+
 def generate_summary():
 
     from sqlalchemy import create_engine
@@ -274,4 +301,4 @@ summary = PythonOperator(
     dag=dag,
 )
 
-[collect_adzuna, collect_usajobs, collect_jooble] >> load_raw >> cleanup_jsons >> clean >> verify_cleaned >> summary
+[collect_adzuna, collect_usajobs, collect_jooble] >> load_raw >> cleanup_jsons >> clean >> verify_cleaned >> generate_dashboard >> summary
