@@ -114,21 +114,11 @@ job-market-pipeline/
 ├── TLDR.md
 └── README.md
 ```
-
-## Getting Started
-
-### Prerequisites
+### 1. Prerequisites
 
 - Docker Desktop
 - Python 3.11+
 - API keys for Adzuna, USAJobs, and Jooble
-
-### 1. Clone the Repository
-
-```bash
-git clone https://github.com/yourusername/job-market-pipeline.git
-cd job-market-pipeline
-```
 
 ### 2. Configure Environment Variables
 
@@ -213,6 +203,7 @@ The DAG consists of 8 tasks:
 | `cleanup_json_files` | Delete processed JSON files | <1 min |
 | `clean_data` | Run cleaning transformations | ~2 min |
 | `verify_cleaned_data` | Validate data quality | <1 min |
+| `generate_dashboard_data` | Generate Dashboard Data | < 1 min
 | `generate_summary` | Log run statistics | <1 min |
 
 **Total Runtime**: ~23 minutes (collection runs in parallel)
@@ -230,48 +221,6 @@ The DAG consists of 8 tasks:
 | Job Type Extraction | Free text → categories | ~5,500 |
 | Salary Max Imputation | Missing max → min + median spread | ~1,500 |
 | Deduplication | Remove duplicate job_ids | ~59,000 |
-
-## Key Insights
-
-From analysis of 44,000+ job postings:
-
-- **Top States**: CA (8,500+), TX (5,200+), NY (4,800+)
-- **Salary Premium**: Private sector pays ~45% more than federal ($140K vs $96K avg)
-- **Job Types**: 78% Full-time, 12% Contract, 10% Other
-- **Data Coverage**: 51 locations (50 states + DC)
-
-## Common Commands
-
-```bash
-# Start/stop containers
-docker-compose up -d
-docker-compose down
-
-# View logs
-docker-compose logs -f airflow-scheduler
-
-# Trigger DAG manually
-docker exec airflow_scheduler airflow dags trigger job_collection_pipeline
-
-# Check DAG status
-docker exec airflow_scheduler airflow dags list-runs -d job_collection_pipeline
-
-# Query database
-docker exec job_market_postgres psql -U postgres -d job_market -c "SELECT COUNT(*) FROM cleaned_jobs"
-
-# Restart scheduler after DAG changes
-docker-compose restart airflow-scheduler
-```
-
-## Troubleshooting
-
-| Issue | Solution |
-|-------|----------|
-| DAG not appearing in UI | Check for import errors: `docker exec airflow_scheduler airflow dags list-import-errors` |
-| Database connection failed | Verify container name is `postgres` not `localhost` in Airflow connection |
-| Package not found | Rebuild image: `docker-compose build --no-cache` |
-| Port 5432 in use | Pipeline uses 5433 externally → 5432 internally |
-| Rate limit exceeded | Adzuna: 250 req/day. Increase delays or reduce search terms |
 
 ## API Rate Limits
 
