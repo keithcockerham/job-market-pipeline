@@ -95,6 +95,7 @@ job-market-pipeline/
 │   ├── custom_adzuna.py         # Adzuna collection script
 │   ├── custom_usajobs.py        # USAJobs collection script
 │   ├── custom_jooble.py         # Jooble collection script
+│   ├── generate_dashboard_data.py         # Generates data for the dashboard
 │   └── data_cleaning.py         # Cleaning transformations
 ├── docs/
 │   ├── index.html               # Dashboard homepage
