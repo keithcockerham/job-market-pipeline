@@ -12,7 +12,7 @@
     <nav class="navbar">
         <div class="container">
             <div class="nav-brand">
-                <h1>Job Market Pipeline</h1>
+                <h1>📊 Job Market Pipeline</h1>
             </div>
             <ul class="nav-links">
                 <li><a href="index.html">Overview</a></li>
@@ -144,7 +144,15 @@
                     </ul>
                 </div>
                 <div class="tech-card">
-                    <h3>8️⃣ generate_summary</h3>
+                    <h3>8️⃣ generate_dashboard_data</h3>
+                    <ul>
+                        <li>Produces a JSON data file</li>
+                        <li>Statistical summary of cleaned data</li>
+                        <li>Used to Generate web graphics</li>
+                    </ul>
+                </div>
+                <div class="tech-card">
+                    <h3>9️⃣ generate_summary</h3>
                     <ul>
                         <li>Produces run statistics</li>
                         <li>Counts by source</li>
@@ -156,7 +164,6 @@
             </div>
         </div>
     </section>
-
     <!-- Infrastructure -->
     <section class="findings">
         <div class="container">
@@ -364,11 +371,12 @@
                 'cleanup_json_files',
                 'clean_data',
                 'verify_cleaned_data',
+                'generate_dashboard_data',
                 'generate_summary'
             ];
             
-            const startTimes = [0, 0, 0, 17, 18, 19, 21, 22];
-            const durations = [17, 17, 17, 1, 1, 2, 1, 0.5];
+            const startTimes = [0, 0, 0, 17, 18, 19, 21, 22,22.5];
+            const durations = [17, 17, 17, 1, 1, 2, 1, 0.5,.5];
             
             const colors = [
                 '#667eea', '#764ba2', '#f5576c',  // Collection (parallel)
@@ -410,7 +418,7 @@
                 annotations: [
                     {
                         x: 8.5,
-                        y: 1.15,
+                        y: 1.08,
                         xref: 'x',
                         yref: 'paper',
                         text: '← Parallel Execution →',
@@ -419,7 +427,7 @@
                     },
                     {
                         x: 20,
-                        y: 1.15,
+                        y: 1.08,
                         xref: 'x',
                         yref: 'paper',
                         text: 'Sequential →',
@@ -447,5 +455,4 @@
         });
     </script>
 </body>
-
 </html>
