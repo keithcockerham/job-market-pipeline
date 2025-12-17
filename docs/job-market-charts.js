@@ -561,13 +561,17 @@ function createPipelineFlow() {
         type: 'sankey',
         orientation: 'h',
         node: {
-            pad: 15,
+            pad: 20,
             thickness: 20,
             line: { color: 'black', width: 0.5 },
             label: [
-                'Adzuna API', 'USAJobs API', 'Jooble API',
-                'Raw Jobs Table', 'Data Cleaning', 'Cleaned Jobs Table',
-                'Analysis Ready'
+                'Adzuna API',           // 0
+                'USAJobs API',          // 1
+                'Jooble API',           // 2
+                'Raw Jobs Table',       // 3
+                'Data Cleaning',        // 4
+                'Cleaned Jobs Table',   // 5
+                'Deploy',     // 6
             ],
             color: ['#667eea', '#764ba2', '#f5576c', '#feca57', '#43e97b', '#00f2fe', '#38ef7d']
         },
@@ -606,15 +610,15 @@ function createDagStructure() {
         'cleanup_json_files',
         'clean_data',
         'verify_cleaned_data',
-        'generate_summary'
-    ];
+        'generate_dashboard_data'
+        ];
     
-    const startTimes = [0, 0, 0, 17, 18, 19, 21, 22];
-    const durations = [17, 17, 17, 1, 1, 2, 1, 0.5];
+    const startTimes = [0, 0, 0, 17, 18, 19, 21, 22, 22.5];  // ← ADD timing
+    const durations = [17, 17, 17, 1, 1, 2, 1, 0.5, 0.5];    // ← ADD duration
     
     const colors = [
         '#667eea', '#764ba2', '#f5576c',
-        '#feca57', '#a55eea', '#43e97b', '#00f2fe', '#38ef7d'
+        '#feca57', '#a55eea', '#43e97b', '#00f2fe', '#ff9f43', '#38ef7d'  // ← ADD color
     ];
 
     const data = tasks.map((task, i) => ({
